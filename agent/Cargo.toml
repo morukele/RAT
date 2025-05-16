@@ -4,3 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+server = { path = "../server" }
+ureq = { version = "2.1", features = ["tls", "json"] }
+uuid = { version = "1.16.0", features = ["v4"] }
+dirs = "6.0.0"
+log = "0.4.27"

@@ -1,10 +1,10 @@
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
-use rat::api::routes::routes;
-use rat::api::AppState;
-use rat::config::Config;
-use rat::db;
-use rat::service::Service;
+use server::api::routes::routes;
+use server::api::AppState;
+use server::config::Config;
+use server::db;
+use server::service::Service;
 use std::env;
 use std::net::TcpListener;
 
