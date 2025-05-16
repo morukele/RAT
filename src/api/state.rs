@@ -1,4 +1,4 @@
-use actix_web::dev::Service;
+use crate::service::Service;
 
 #[derive(Debug)]
 pub struct AppState {
@@ -6,7 +6,7 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn new() -> Self {
-        AppState {}
+    pub fn new(service: Service) -> Self {
+        AppState { service }
     }
 }
