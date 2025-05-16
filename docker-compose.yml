@@ -12,5 +12,23 @@ services:
     environment:
       - ENV_PORT=${ENV_PORT}
       - ENV_HOST=${ENV_HOST}
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgres://postgres:password@db:5432/ratdb?sslmode=disable
+    depends_on:
+      - db
     restart: unless-stopped
+
+  db:
+    image: postgres:15
+    container_name: rat_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ratdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

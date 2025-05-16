@@ -7,6 +7,7 @@ use server::db;
 use server::service::Service;
 use std::env;
 use std::net::TcpListener;
+use actix_cors::Cors;
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result<(), anyhow::Error> {
@@ -30,6 +31,7 @@ async fn main() -> Result<(), anyhow::Error> {
     HttpServer::new(move || {
         App::new()
             .wrap(actix_web::middleware::Logger::default())
+            .wrap(Cors::permissive())
             .configure(routes)
             .app_data(Data::new(app_state.clone()))
     })

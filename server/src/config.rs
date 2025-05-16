@@ -10,7 +10,7 @@ pub struct Config {
 const ENV_DATABASE_URL: &str = "DATABASE_URL";
 const ENV_PORT: &str = "ENV_PORT";
 const ENV_HOST: &str = "ENV_HOST";
-const DEFAULT_PORT: u16 = 8080;
+const DEFAULT_PORT: u16 = 8000;
 
 impl Config {
     pub fn load() -> Result<Config, Error> {
