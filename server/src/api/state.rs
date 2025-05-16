@@ -1,6 +1,6 @@
 use crate::service::Service;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AppState {
     pub service: Service,
 }

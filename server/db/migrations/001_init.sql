@@ -8,7 +8,7 @@ CREATE TABLE agents
 CREATE TABLE jobs
 (
     id          UUID PRIMARY KEY,
-    create_at   TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at  TIMESTAMP WITH TIME ZONE NOT NULL,
     executed_at TIMESTAMP WITH TIME ZONE,
     command     TEXT                     NOT NULL,
     args        JSONB                    NOT NULL,

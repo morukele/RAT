@@ -1,0 +1,18 @@
+meta {
+  name: create_job
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/api/jobs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "agent_id": "60f41e0e-909b-44e3-815e-b02eff51b652",
+    "command": "mkdir .hidden"
+  }
+}

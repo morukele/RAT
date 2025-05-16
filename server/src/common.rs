@@ -1,5 +1,4 @@
 use crate::entities::Agent;
-use actix_web::FromRequest;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

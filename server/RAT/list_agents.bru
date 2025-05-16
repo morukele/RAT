@@ -1,0 +1,11 @@
+meta {
+  name: list_agents
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://127.0.0.1:8000/api/agents
+  body: none
+  auth: inherit
+}

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 use uuid::Uuid;
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, sqlx::FromRow)]
 pub struct Agent {
     pub id: Uuid,
     pub created_at: DateTime<Utc>,
