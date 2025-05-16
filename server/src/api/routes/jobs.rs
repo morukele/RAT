@@ -1,7 +1,7 @@
 use crate::api::AppState;
 use crate::common;
 use crate::{entities, error};
-use actix_web::{get, post, web, HttpResponse};
+use actix_web::{HttpResponse, get, post, web};
 use std::time::Duration;
 use uuid::Uuid;
 
@@ -11,7 +11,7 @@ pub async fn create_job(
     input: web::Json<common::CreateJob>,
 ) -> Result<HttpResponse, error::Error> {
     let job = state.service.create_job(input.into_inner()).await?;
-    let job: entities::Job = job.into();
+    let job: entities::Job = job;
     let res = common::Response::ok(job);
 
     Ok(HttpResponse::Ok().json(res))
@@ -23,15 +23,17 @@ pub async fn get_job_result(
 ) -> Result<HttpResponse, error::Error> {
     // check if job_id is a valid Uuid
     let job_id = job_id.into_inner();
+    log::debug!("Job Route -> job_id: {}", job_id);
 
     let sleep_for = Duration::from_secs(1);
 
     // long polling: 5 secs
     for _ in 0..5u64 {
         let job = state.service.find_job(job_id).await?;
+        log::debug!("Job Route -> job: {:?}", job);
         match &job.output {
             Some(_) => {
-                let job: entities::Job = job.into();
+                let job: entities::Job = job;
                 let res = common::Response::ok(job);
                 return Ok(HttpResponse::Ok().json(res));
             }
@@ -42,7 +44,7 @@ pub async fn get_job_result(
     Ok(HttpResponse::Ok().finish())
 }
 
-#[get("/jobs/{agent_id}/jobs")]
+#[get("/agents/{agent_id}/job")]
 pub async fn get_agent_job(
     state: web::Data<AppState>,
     agent_id: web::Path<Uuid>,

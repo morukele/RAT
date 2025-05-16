@@ -1,11 +1,11 @@
 use crate::api::AppState;
 use crate::{common, error};
-use actix_web::{get, post, web, HttpResponse};
+use actix_web::{HttpResponse, get, post, web};
 
 #[get("/agents")]
 pub async fn get_agents(state: web::Data<AppState>) -> Result<HttpResponse, error::Error> {
     let agent = state.service.list_agents().await?;
-    let agents = agent.into_iter().map(Into::into).collect();
+    let agents = agent.into_iter().collect();
     let res = common::AgentList { agents };
 
     let res = common::Response::ok(res);

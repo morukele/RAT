@@ -22,7 +22,7 @@ impl<T: Serialize> Response<T> {
     pub fn err(err: Error) -> Response<()> {
         Response::<()> {
             data: None,
-            error: Some(err.into()),
+            error: Some(err),
         }
     }
 }

@@ -1,5 +1,4 @@
-use crate::{error, AGENT_ID_FILE, SERVER_URL};
-use server;
+use crate::{AGENT_ID_FILE, SERVER_URL, error};
 use server::common;
 use std::fs;
 use std::path::PathBuf;

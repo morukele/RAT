@@ -22,16 +22,16 @@ pub struct Job {
     pub agent_id: Uuid,
 }
 
-impl Into<common::Job> for Job {
-    fn into(self) -> common::Job {
+impl From<Job> for common::Job {
+    fn from(val: Job) -> Self {
         common::Job {
-            id: self.id,
-            created_at: self.created_at,
-            executed_at: self.executed_at,
-            command: self.command,
-            args: self.args.0,
-            output: self.output,
-            agent_id: self.agent_id,
+            id: val.id,
+            created_at: val.created_at,
+            executed_at: val.executed_at,
+            command: val.command,
+            args: val.args.0,
+            output: val.output,
+            agent_id: val.agent_id,
         }
     }
 }

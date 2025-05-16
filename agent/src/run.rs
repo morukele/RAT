@@ -75,5 +75,5 @@ fn execute_command(command: String, args: Vec<String>) -> String {
         }
     };
 
-    return ret;
+    ret
 }

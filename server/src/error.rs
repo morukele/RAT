@@ -17,9 +17,7 @@ pub enum Error {
 
 impl From<sqlx::Error> for Error {
     fn from(err: sqlx::Error) -> Self {
-        match err {
-            _ => Error::Internal(err.to_string()),
-        }
+        Error::Internal(err.to_string())
     }
 }
 

@@ -35,8 +35,8 @@ impl Repository {
         db: &Pool<Postgres>,
         agent: &Agent,
     ) -> Result<(), error::Error> {
-        const QUERY: &str = "UPDATE agents\
-            SET last_seen_at = $1 \
+        const QUERY: &str = "UPDATE agents
+            SET last_seen_at = $1
             WHERE id = $2";
 
         match sqlx::query(QUERY)
@@ -46,7 +46,7 @@ impl Repository {
             .await
         {
             Err(err) => {
-                log::error!("udpate_event: updating agent: {}", &err);
+                log::error!("update_event: updating agent: {}", &err);
                 Err(err.into())
             }
             Ok(_) => Ok(()),

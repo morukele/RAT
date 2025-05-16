@@ -1,4 +1,5 @@
 use crate::{api, error};
+use log::log;
 use server::common;
 use std::thread::sleep;
 use std::time::Duration;
@@ -14,8 +15,11 @@ pub fn run(api_client: &api::Client, agent_id: &str, command: &str) -> Result<()
     };
     let job_id = api_client.create_job(input)?;
 
+    log::debug!("Job created: {}", job_id);
+
     loop {
         let job_output = api_client.get_job_results(job_id)?;
+        log::debug!("job results: {:?}", job_output);
         if let Some(job_output) = job_output {
             println!("{}", job_output);
             break;

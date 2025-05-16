@@ -41,11 +41,8 @@ impl Service {
     pub async fn create_job(&self, input: common::CreateJob) -> Result<Job, error::Error> {
         println!("creating job: {:?}", input);
         let command = input.command.trim();
-        let mut command_with_args: Vec<String> = command
-            .split_whitespace()
-            .into_iter()
-            .map(|s| s.to_owned())
-            .collect();
+        let mut command_with_args: Vec<String> =
+            command.split_whitespace().map(|s| s.to_owned()).collect();
 
         if command_with_args.is_empty() {
             return Err(error::Error::InvalidArgument(

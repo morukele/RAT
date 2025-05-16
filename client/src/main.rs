@@ -34,9 +34,9 @@ fn main() -> Result<(), anyhow::Error> {
 
     let api_client = api::Client::new(SERVER_URL.to_string());
 
-    if let Some(_) = cli.subcommand_matches(cli::AGENTS) {
+    if cli.subcommand_matches(cli::AGENTS).is_some() {
         cli::agents::run(&api_client)?;
-    } else if let Some(_) = cli.subcommand_matches(cli::JOBS) {
+    } else if cli.subcommand_matches(cli::JOBS).is_some() {
         cli::job::run(&api_client)?;
     } else if let Some(matches) = cli.subcommand_matches(cli::EXEC) {
         // safe to unwrap required arguments
