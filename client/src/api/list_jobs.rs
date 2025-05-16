@@ -1,4 +1,4 @@
-use crate::cli::Client;
+use crate::api::Client;
 use crate::error::Error;
 use crate::{error, SERVER_URL};
 use server::common;
@@ -13,7 +13,7 @@ impl Client {
         if let Some(err) = api_res.error {
             return Err(Error::Internal(err.message));
         }
-        
+
         Ok(api_res.data.unwrap().jobs)
     }
 }

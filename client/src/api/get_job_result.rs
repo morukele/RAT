@@ -1,4 +1,4 @@
-use crate::cli::Client;
+use crate::api::Client;
 use crate::{error, SERVER_URL};
 use server::common;
 

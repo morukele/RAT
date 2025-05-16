@@ -8,3 +8,7 @@ server = { path = "../server" }
 thiserror = "2.0.12"
 uuid = "1.16.0"
 reqwest = { version = "0.12.15", features = ["blocking", "json"] }
+prettytable = "0.10.0"
+anyhow = "1.0.98"
+error = "0.1.9"
+clap = { version = "4.5.38", features = ["cargo"] }
