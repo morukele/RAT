@@ -7,6 +7,9 @@ use uuid::Uuid;
 #[derive(Deserialize, Serialize, Debug, Clone, sqlx::FromRow)]
 pub struct Agent {
     pub id: Uuid,
+    pub ip_addr: String,
+    pub name: String,
+    pub username: String,
     pub created_at: DateTime<Utc>,
     pub last_seen_at: DateTime<Utc>,
 }

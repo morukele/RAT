@@ -12,11 +12,14 @@ impl Repository {
         agent: &Agent,
     ) -> Result<(), error::Error> {
         const QUERY: &str = "INSERT INTO agents\
-            (id, created_at, last_seen_at)\
-            VALUES ($1, $2, $3)";
+            (id, ip_addr, name, username, created_at, last_seen_at)\
+            VALUES ($1, $2, $3, $4, $5, $6)";
 
         match sqlx::query(QUERY)
             .bind(agent.id)
+            .bind(&agent.ip_addr)
+            .bind(&agent.name)
+            .bind(&agent.username)
             .bind(agent.created_at)
             .bind(agent.last_seen_at)
             .execute(db)
