@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+server = { path = "../server" }
+thiserror = "2.0.12"
+uuid = "1.16.0"
+reqwest = { version = "0.12.15", features = ["blocking", "json"] }
