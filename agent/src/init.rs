@@ -20,9 +20,9 @@ pub fn init(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
     Ok(agent_id)
 }
 
-pub fn register(api_clinet: &ureq::Agent) -> Result<Uuid, error::Error> {
+pub fn register(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
     let register_agent_route = format!("{}/api/agents", SERVER_URL);
-    let api_res: common::Response<common::AgentRegistered> = api_clinet
+    let api_res: common::Response<common::AgentRegistered> = api_client
         .post(register_agent_route.as_str())
         .call()?
         .into_json()?;

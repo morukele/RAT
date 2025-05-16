@@ -4,7 +4,7 @@ mod api;
 mod cli;
 mod error;
 
-pub const SERVER_URL: &str = "http://localhost:8080";
+pub const SERVER_URL: &str = "http://localhost:8000";
 
 fn main() -> Result<(), anyhow::Error> {
     let cli = Command::new(clap::crate_name!())
