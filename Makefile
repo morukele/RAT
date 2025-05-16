@@ -1,4 +1,4 @@
-DOCKER_IMAGE = rat_server:latest
+DOCKER_IMAGE = rat:latest
 
 .PHONY: all
 all: build docker
@@ -10,7 +10,7 @@ build: agent client server
 agent:
 	cargo build -p agent --release
 
-.PHONY: clinet
+.PHONY: client
 client:
 	cargo build -p client --release
 
@@ -20,7 +20,7 @@ server:
 
 .PHONY: docker
 docker:
-	docker build -t ${DOCKER_IMAHE} .
+	docker build -t $(DOCKER_IMAGE) .
 
 .PHONY: dev
 dev:
@@ -33,3 +33,7 @@ fmt:
 .PHONY: check
 check:
 	cargo check
+
+.PHONY: compose
+compose:
+	docker-compose up --build -d

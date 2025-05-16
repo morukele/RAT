@@ -1,6 +1,6 @@
 [workspace]
-resolver = "3"
-members = [ "agent","client", "server"]
+resolver = "1"
+members = ["agent", "client", "server"]
 
 [profile.release]
 lto = true

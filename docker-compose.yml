@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  rat-server:
+    image: rat:latest
+    container_name: rat_server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${ENV_PORT}:${ENV_PORT}"
+    environment:
+      - ENV_PORT=${ENV_PORT}
+      - ENV_HOST=${ENV_HOST}
+      - DATABASE_URL=${DATABASE_URL}
+    restart: unless-stopped

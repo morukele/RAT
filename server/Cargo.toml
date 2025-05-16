@@ -8,7 +8,7 @@ path = "src/lib.rs"
 
 [[bin]]
 path = "src/main.rs"
-name = "rat"
+name = "server"
 
 [dependencies]
 actix-web = "4.11.0"
