@@ -74,6 +74,7 @@ sequenceDiagram
     N2 ->> N2: create a job for the command
     N2 ->> N2: store job in database
     N2 ->> N3: send job to agent
+    Note over N1,N3: Agent command execution and querying
     N3 ->> N3: execute command on traget computer
     loop Pooling
         N2 ->> N3: query for jobs update
