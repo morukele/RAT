@@ -3,7 +3,7 @@ use std::fmt;
 #[derive(Debug)]
 pub enum Error {
     Internal(String),
-    Transport(ureq::Error),
+    Transport(Box<ureq::Error>),
     Api(String),
     Io(std::io::Error),
 }
@@ -19,7 +19,7 @@ impl std::error::Error for Error {}
 impl std::convert::From<ureq::Error> for Error {
     fn from(value: ureq::Error) -> Self {
         match value {
-            err @ ureq::Error::Transport(_) => Error::Transport(err),
+            err @ ureq::Error::Transport(_) => Error::Transport(Box::new(err)),
             err @ ureq::Error::Status(_, _) => Error::Api(err.to_string()),
         }
     }

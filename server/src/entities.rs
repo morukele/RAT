@@ -14,6 +14,13 @@ pub struct Agent {
     pub last_seen_at: DateTime<Utc>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AgentDetail {
+    pub ip_addr: String,
+    pub name: String,
+    pub username: String,
+}
+
 #[derive(Debug, Clone, sqlx::FromRow, Serialize, Deserialize)]
 pub struct Job {
     pub id: Uuid,

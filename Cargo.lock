@@ -220,10 +220,12 @@ name = "agent"
 version = "0.1.0"
 dependencies = [
  "dirs",
+ "local-ip-address",
  "log",
  "server",
  "ureq",
  "uuid",
+ "whoami",
 ]
 
 [[package]]

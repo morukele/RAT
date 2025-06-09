@@ -9,3 +9,5 @@ ureq = { version = "2.1", features = ["tls", "json"] }
 uuid = { version = "1.16.0", features = ["v4"] }
 dirs = "6.0.0"
 log = "0.4.27"
+local-ip-address = "0.6.5"
+whoami = "1.6.0"

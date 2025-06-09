@@ -1,6 +1,8 @@
 use crate::{AGENT_ID_FILE, SERVER_URL, error};
-use server::common;
+use local_ip_address::local_ip;
+use server::{common, entities};
 use std::fs;
+use std::net::{IpAddr, Ipv4Addr};
 use std::path::PathBuf;
 use uuid::Uuid;
 
@@ -21,9 +23,17 @@ pub fn init(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
 
 pub fn register(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
     let register_agent_route = format!("{}/api/agents", SERVER_URL);
+    let agent_detals = entities::AgentDetail {
+        ip_addr: local_ip()
+            .unwrap_or(IpAddr::from(Ipv4Addr::new(0, 0, 0, 0)))
+            .to_string(),
+        name: whoami::realname(),
+        username: whoami::username(),
+    };
+
     let api_res: common::Response<common::AgentRegistered> = api_client
         .post(register_agent_route.as_str())
-        .call()?
+        .send_json(agent_detals)?
         .into_json()?;
 
     let agent_id = match (api_res.data, api_res.error) {

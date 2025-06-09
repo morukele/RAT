@@ -1,9 +1,8 @@
 use crate::common::AgentRegistered;
+use crate::entities::AgentDetail;
 use crate::service::Service;
 use crate::{entities, error};
 use chrono::Utc;
-use local_ip_address::local_ip;
-use std::net::{IpAddr, Ipv4Addr};
 use uuid::Uuid;
 
 impl Service {
@@ -11,21 +10,19 @@ impl Service {
         self.repo.find_all_agents(&self.db).await
     }
 
-    pub async fn register_agent(&self) -> Result<AgentRegistered, error::Error> {
+    pub async fn register_agent(
+        &self,
+        agent_details: AgentDetail,
+    ) -> Result<AgentRegistered, error::Error> {
         let id = Uuid::new_v4();
         let created_at = Utc::now();
-        let ip_addr = local_ip()
-            .unwrap_or(IpAddr::from(Ipv4Addr::new(0, 0, 0, 0)))
-            .to_string();
-        let name = whoami::realname();
-        let username = whoami::username();
         let agent = entities::Agent {
             id,
-            ip_addr,
-            name,
-            username,
             created_at,
             last_seen_at: created_at,
+            ip_addr: agent_details.ip_addr,
+            name: agent_details.name,
+            username: agent_details.username,
         };
 
         self.repo.create_agent(&self.db, &agent).await?;
