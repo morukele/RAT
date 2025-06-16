@@ -23,6 +23,8 @@ pub fn init(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
 
 pub fn register(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
     let register_agent_route = format!("{}/api/agents", SERVER_URL);
+    let mut rand_generator = rand::rngs::OsRng;
+    let identity_key = ed25519_dalek::Keypair::generate(&mut rand_generator);
     let agent_detals = entities::AgentDetail {
         ip_addr: local_ip()
             .unwrap_or(IpAddr::from(Ipv4Addr::new(0, 0, 0, 0)))

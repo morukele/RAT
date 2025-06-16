@@ -1,5 +1,6 @@
 pub mod agents;
 pub mod exec;
+pub mod identity;
 pub mod job;
 
 pub const AGENTS: &str = "agents";

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   rat-server:
@@ -12,14 +12,14 @@ services:
     environment:
       - ENV_PORT=${ENV_PORT}
       - ENV_HOST=${ENV_HOST}
-      - DATABASE_URL=postgres://postgres:password@rat_postgres:5432/ratdb?sslmode=disable
+      - DATABASE_URL=postgres://postgres:password@ratdb:5432/ratdb?sslmode=disable
     depends_on:
       - db
     restart: unless-stopped
 
   db:
     image: postgres:15
-    container_name: rat_postgres
+    container_name: ratdb
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
