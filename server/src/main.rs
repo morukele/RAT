@@ -1,13 +1,13 @@
+use actix_cors::Cors;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
-use server::api::routes::routes;
 use server::api::AppState;
+use server::api::routes::routes;
 use server::config::Config;
 use server::db;
 use server::service::Service;
 use std::env;
 use std::net::TcpListener;
-use actix_cors::Cors;
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result<(), anyhow::Error> {

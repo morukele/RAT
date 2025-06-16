@@ -1,4 +1,4 @@
-use crate::entities::Agent;
+use crate::entities::{Agent, AgentCreationDetail};
 use crate::error;
 use crate::error::Error;
 use crate::repository::Repository;

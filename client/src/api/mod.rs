@@ -1,4 +1,5 @@
 mod create_job;
+mod get_agent;
 mod get_job_result;
 mod list_agents;
 mod list_jobs;

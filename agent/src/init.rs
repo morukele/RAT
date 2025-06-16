@@ -1,10 +1,13 @@
-use crate::{AGENT_ID_FILE, SERVER_URL, error};
+use crate::{config, error};
+use ed25519_dalek::ed25519::signature::SignerMut;
 use local_ip_address::local_ip;
+use rand::RngCore;
 use server::{common, entities};
 use std::fs;
 use std::net::{IpAddr, Ipv4Addr};
 use std::path::PathBuf;
 use uuid::Uuid;
+use x25519_dalek::{X25519_BASEPOINT_BYTES, x25519};
 
 pub fn init(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
     let saved_agent_id = get_saved_agent_id()?;
@@ -12,25 +15,35 @@ pub fn init(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
     let agent_id = match saved_agent_id {
         Some(agent_id) => agent_id,
         None => {
-            let agent_id = register(api_client)?;
-            save_agent_id(agent_id)?;
-            agent_id
+            let config = register(api_client)?;
+            save_agent_id(config.agent_id)?;
+            config.agent_id
         }
     };
 
     Ok(agent_id)
 }
 
-pub fn register(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
-    let register_agent_route = format!("{}/api/agents", SERVER_URL);
+pub fn register(api_client: &ureq::Agent) -> Result<config::Config, error::Error> {
+    let register_agent_route = format!("{}/api/agents", config::SERVER_URL);
+
+    // key generation
     let mut rand_generator = rand::rngs::OsRng;
-    let identity_key = ed25519_dalek::Keypair::generate(&mut rand_generator);
-    let agent_detals = entities::AgentDetail {
+    let mut identity_keypair = ed25519_dalek::Keypair::generate(&mut rand_generator);
+    let mut private_prekey = [0u8; config::X25519_PRIVATE_KEY_SIZE];
+    rand_generator.fill_bytes(&mut private_prekey);
+    let public_prekey = x25519(private_prekey, X25519_BASEPOINT_BYTES);
+    let public_prekey_signature = identity_keypair.sign(&public_prekey);
+
+    let agent_detals = entities::AgentCreationDetail {
         ip_addr: local_ip()
             .unwrap_or(IpAddr::from(Ipv4Addr::new(0, 0, 0, 0)))
             .to_string(),
         name: whoami::realname(),
         username: whoami::username(),
+        identity_public_key: identity_keypair.public.to_bytes().to_vec(),
+        public_prekey: public_prekey.clone().to_vec(),
+        public_prekey_signature: public_prekey_signature.to_bytes().to_vec(),
     };
 
     let api_res: common::Response<common::AgentRegistered> = api_client
@@ -38,18 +51,26 @@ pub fn register(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
         .send_json(agent_detals)?
         .into_json()?;
 
-    let agent_id = match (api_res.data, api_res.error) {
-        (Some(data), None) => Ok(data.id),
-        (None, Some(error)) => Err(error::Error::Api(error.message)),
-        (None, None) => Err(error::Error::Api(
-            "Received invalid api response: data and error are both null".to_string(),
-        )),
-        (Some(_), Some(_)) => Err(error::Error::Api(
-            "Received invalid api response: data and error are both non null".to_string(),
-        )),
-    }?;
+    if let Some(err) = api_res.error {
+        return Err(error::Error::Api(err.message));
+    }
 
-    Ok(agent_id)
+    // return agent information
+    let client_public_key_bytes = base64::decode(config::CLIENT_IDENTITY_PUBLIC_KEY)
+        .map_err(|e| error::Error::Internal(e.to_string()))?;
+    let client_identity_public_key = ed25519_dalek::PublicKey::from_bytes(&client_public_key_bytes)
+        .map_err(|e| error::Error::Internal(e.to_string()))?;
+
+    let config = config::Config {
+        agent_id: api_res.data.unwrap().id,
+        identity_public_key: identity_keypair.public,
+        identity_private_key: identity_keypair.secret,
+        public_prekey,
+        private_prekey,
+        client_identity_public_key,
+    };
+
+    Ok(config)
 }
 
 pub fn save_agent_id(agent_id: Uuid) -> Result<(), error::Error> {
@@ -77,7 +98,7 @@ pub fn get_agent_id_file_path() -> Result<PathBuf, error::Error> {
         None => return Err(error::Error::Internal("Error getting home dir".to_string())),
     };
 
-    home_dir.push(AGENT_ID_FILE);
+    home_dir.push(config::AGENT_ID_FILE);
 
     Ok(home_dir)
 }

@@ -2,9 +2,8 @@ use clap::{Arg, Command};
 
 mod api;
 mod cli;
+mod config;
 mod error;
-
-pub const SERVER_URL: &str = "http://localhost:8000";
 
 fn main() -> Result<(), anyhow::Error> {
     let cli = Command::new(clap::crate_name!())
@@ -32,7 +31,7 @@ fn main() -> Result<(), anyhow::Error> {
         .arg_required_else_help(true)
         .get_matches();
 
-    let api_client = api::Client::new(SERVER_URL.to_string());
+    let api_client = api::Client::new(config::SERVER_URL.to_string());
 
     if cli.subcommand_matches(cli::AGENTS).is_some() {
         cli::agents::run(&api_client)?;

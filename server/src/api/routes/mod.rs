@@ -2,11 +2,11 @@ mod agents;
 mod index;
 mod jobs;
 
-use crate::api::routes::agents::{get_agents, post_agents};
+use crate::api::routes::agents::{get_agent, get_agents, post_agents};
 use crate::api::routes::jobs::{
     create_job, get_agent_job, get_job_result, get_jobs, post_job_result,
 };
-use actix_web::{get, web, HttpResponse};
+use actix_web::{HttpResponse, get, web};
 
 #[get("/health")]
 pub async fn health_check() -> HttpResponse {
@@ -22,6 +22,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(post_job_result)
             .service(post_agents)
             .service(get_agents)
-            .service(get_agent_job),
+            .service(get_agent_job)
+            .service(get_agent),
     );
 }

@@ -1,3 +1,5 @@
+use std::str::Bytes;
+
 use crate::common;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -10,15 +12,21 @@ pub struct Agent {
     pub ip_addr: String,
     pub name: String,
     pub username: String,
+    pub identity_public_key: Vec<u8>,
+    pub public_prekey: Vec<u8>,
+    pub public_prekey_signature: Vec<u8>,
     pub created_at: DateTime<Utc>,
     pub last_seen_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct AgentDetail {
+pub struct AgentCreationDetail {
     pub ip_addr: String,
     pub name: String,
     pub username: String,
+    pub identity_public_key: Vec<u8>,
+    pub public_prekey: Vec<u8>,
+    pub public_prekey_signature: Vec<u8>,
 }
 
 #[derive(Debug, Clone, sqlx::FromRow, Serialize, Deserialize)]

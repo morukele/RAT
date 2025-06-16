@@ -229,6 +229,7 @@ dependencies = [
 name = "agent"
 version = "0.1.0"
 dependencies = [
+ "base64 0.13.1",
  "dirs",
  "ed25519-dalek",
  "local-ip-address",
@@ -238,6 +239,7 @@ dependencies = [
  "ureq",
  "uuid",
  "whoami",
+ "x25519-dalek 1.1.1",
 ]
 
 [[package]]
@@ -590,7 +592,7 @@ dependencies = [
  "server",
  "thiserror 2.0.12",
  "uuid",
- "x25519-dalek",
+ "x25519-dalek 2.0.1",
 ]
 
 [[package]]
@@ -3832,6 +3834,17 @@ name = "writeable"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea2f10b9bb0928dfb1b42b65e1f9e36f7f54dbdf08457afefb38afcdec4fa2bb"
+
+[[package]]
+name = "x25519-dalek"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a0c105152107e3b96f6a00a65e86ce82d9b125230e1c4302940eca58ff71f4f"
+dependencies = [
+ "curve25519-dalek 3.2.0",
+ "rand_core 0.5.1",
+ "zeroize",
+]
 
 [[package]]
 name = "x25519-dalek"

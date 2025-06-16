@@ -4,6 +4,9 @@ CREATE TABLE agents
     ip_addr      TEXT                     NOT NULL,
     name         TEXT                     NOT NULL,
     username     TEXT                     NOT NULL,
+    identity_public_key BYTEA NOT NULL,
+    public_prekey BYTEA NOT NULL,
+    public_prekey_signature BYTEA NOT NULL
     created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
     last_seen_at TIMESTAMP WITH TIME ZONE NOT NULL
 );

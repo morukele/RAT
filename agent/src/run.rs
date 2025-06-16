@@ -1,4 +1,4 @@
-use crate::SERVER_URL;
+use crate::config;
 use server::common;
 use std::process::Command;
 use std::thread::sleep;
@@ -7,8 +7,8 @@ use uuid::Uuid;
 
 pub fn run(api_client: &ureq::Agent, agent_id: Uuid) -> ! {
     let sleep_for = Duration::from_secs(1);
-    let get_job_route = format!("{}/api/agents/{}/job", SERVER_URL, agent_id);
-    let post_job_result_route = format!("{}/api/jobs/result", SERVER_URL);
+    let get_job_route = format!("{}/api/agents/{}/job", config::SERVER_URL, agent_id);
+    let post_job_result_route = format!("{}/api/jobs/result", config::SERVER_URL);
 
     loop {
         let server_res = match api_client.get(get_job_route.as_str()).call() {
