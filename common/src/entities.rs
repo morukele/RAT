@@ -1,8 +1,9 @@
-use crate::entities::Agent;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
+
+use crate::crypto;
 
 #[derive(Serialize, Debug, Deserialize)]
 pub struct Response<T: Serialize> {
@@ -41,11 +42,15 @@ pub struct AgentRegistered {
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct CreateJob {
+    pub id: Uuid,
     pub agent_id: Uuid,
-    pub command: String,
+    pub encrypted_job: Vec<u8>,
+    pub ephemeral_public_key: [u8; crypto::X25519_PRIVATE_KEY_SIZE],
+    pub nonce: [u8; crypto::XCHACHA20_POLY1305_NONCE_SIZE],
+    pub signature: Vec<u8>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, sqlx::FromRow)]
 pub struct Job {
     pub id: Uuid,
     pub created_at: DateTime<Utc>,
@@ -77,4 +82,34 @@ pub struct AgentList {
 pub struct UpdateJobResult {
     pub job_id: Uuid,
     pub output: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, sqlx::FromRow)]
+pub struct Agent {
+    pub id: Uuid,
+    pub ip_addr: String,
+    pub name: String,
+    pub username: String,
+    pub identity_public_key: [u8; crypto::ED25519_PUBLIC_KEY_SIZE],
+    pub public_prekey: [u8; crypto::X25519_PUBLIC_KEY_SIZE],
+    pub public_prekey_signature: Vec<u8>,
+    pub created_at: DateTime<Utc>,
+    pub last_seen_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AgentCreationDetail {
+    pub ip_addr: String,
+    pub name: String,
+    pub username: String,
+    pub identity_public_key: [u8; crypto::ED25519_PUBLIC_KEY_SIZE],
+    pub public_prekey: [u8; crypto::X25519_PUBLIC_KEY_SIZE],
+    pub public_prekey_signature: Vec<u8>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct JobPayload {
+    pub command: String,
+    pub args: Vec<String>,
+    pub result_ephemeral_public_key: [u8; crypto::X25519_PUBLIC_KEY_SIZE],
 }

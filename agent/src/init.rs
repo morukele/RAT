@@ -1,13 +1,14 @@
 use crate::{config, error};
+use common::crypto;
+use common::entities;
 use ed25519_dalek::ed25519::signature::SignerMut;
 use local_ip_address::local_ip;
 use rand::RngCore;
-use server::{common, entities};
 use std::fs;
 use std::net::{IpAddr, Ipv4Addr};
 use std::path::PathBuf;
 use uuid::Uuid;
-use x25519_dalek::{X25519_BASEPOINT_BYTES, x25519};
+use x25519_dalek::{x25519, X25519_BASEPOINT_BYTES};
 
 pub fn init(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
     let saved_agent_id = get_saved_agent_id()?;
@@ -24,13 +25,13 @@ pub fn init(api_client: &ureq::Agent) -> Result<Uuid, error::Error> {
     Ok(agent_id)
 }
 
-pub fn register(api_client: &ureq::Agent) -> Result<config::Config, error::Error> {
+pub fn register(api_client: &ureq::Agent) -> Result<crypto::Config, error::Error> {
     let register_agent_route = format!("{}/api/agents", config::SERVER_URL);
 
     // key generation
     let mut rand_generator = rand::rngs::OsRng;
     let mut identity_keypair = ed25519_dalek::Keypair::generate(&mut rand_generator);
-    let mut private_prekey = [0u8; config::X25519_PRIVATE_KEY_SIZE];
+    let mut private_prekey = [0u8; crypto::X25519_PRIVATE_KEY_SIZE];
     rand_generator.fill_bytes(&mut private_prekey);
     let public_prekey = x25519(private_prekey, X25519_BASEPOINT_BYTES);
     let public_prekey_signature = identity_keypair.sign(&public_prekey);
@@ -46,7 +47,7 @@ pub fn register(api_client: &ureq::Agent) -> Result<config::Config, error::Error
         public_prekey_signature: public_prekey_signature.to_bytes().to_vec(),
     };
 
-    let api_res: common::Response<common::AgentRegistered> = api_client
+    let api_res: entities::Response<entities::AgentRegistered> = api_client
         .post(register_agent_route.as_str())
         .send_json(agent_detals)?
         .into_json()?;
@@ -61,7 +62,7 @@ pub fn register(api_client: &ureq::Agent) -> Result<config::Config, error::Error
     let client_identity_public_key = ed25519_dalek::PublicKey::from_bytes(&client_public_key_bytes)
         .map_err(|e| error::Error::Internal(e.to_string()))?;
 
-    let config = config::Config {
+    let config = crypto::Config {
         agent_id: api_res.data.unwrap().id,
         identity_public_key: identity_keypair.public,
         identity_private_key: identity_keypair.secret,

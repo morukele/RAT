@@ -1,7 +1,7 @@
-use crate::entities::Job;
+use crate::error;
 use crate::service::Service;
-use crate::{common, error};
 use chrono::Utc;
+use common::entities::{CreateJob, Job, UpdateJobResult};
 use sqlx::types::Json;
 use uuid::Uuid;
 
@@ -27,10 +27,7 @@ impl Service {
         }
     }
 
-    pub async fn update_job_result(
-        &self,
-        input: common::UpdateJobResult,
-    ) -> Result<(), error::Error> {
+    pub async fn update_job_result(&self, input: UpdateJobResult) -> Result<(), error::Error> {
         let mut job = self.repo.find_job_by_id(&self.db, input.job_id).await?;
 
         job.executed_at = Some(Utc::now());
@@ -38,7 +35,7 @@ impl Service {
         self.repo.update_job(&self.db, &job).await
     }
 
-    pub async fn create_job(&self, input: common::CreateJob) -> Result<Job, error::Error> {
+    pub async fn create_job(&self, input: CreateJob) -> Result<Job, error::Error> {
         println!("creating job: {:?}", input);
         let command = input.command.trim();
         let mut command_with_args: Vec<String> =
@@ -58,7 +55,7 @@ impl Service {
             created_at: now,
             executed_at: None,
             command,
-            args: Json(command_with_args),
+            args: Vec::from(command_with_args),
             output: None,
             agent_id: input.agent_id,
         };

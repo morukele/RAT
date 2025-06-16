@@ -1,18 +1,18 @@
 use crate::api::AppState;
-use crate::common;
-use crate::{entities, error};
+use crate::error;
 use actix_web::{HttpResponse, get, post, web};
+use common::entities;
 use std::time::Duration;
 use uuid::Uuid;
 
 #[post("/jobs")]
 pub async fn create_job(
     state: web::Data<AppState>,
-    input: web::Json<common::CreateJob>,
+    input: web::Json<entities::CreateJob>,
 ) -> Result<HttpResponse, error::Error> {
     let job = state.service.create_job(input.into_inner()).await?;
     let job: entities::Job = job;
-    let res = common::Response::ok(job);
+    let res = entities::Response::ok(job);
 
     Ok(HttpResponse::Ok().json(res))
 }
@@ -34,7 +34,7 @@ pub async fn get_job_result(
         match &job.output {
             Some(_) => {
                 let job: entities::Job = job;
-                let res = common::Response::ok(job);
+                let res = entities::Response::ok(job);
                 return Ok(HttpResponse::Ok().json(res));
             }
             None => tokio::time::sleep(sleep_for).await,
@@ -56,13 +56,13 @@ pub async fn get_agent_job(
     for _ in 0..5u64 {
         match state.service.get_agent_job(agent_id).await? {
             Some(job) => {
-                let agent_job = common::AgentJob {
+                let agent_job = entities::AgentJob {
                     id: job.id,
                     command: job.command,
-                    args: job.args.0,
+                    args: job.args,
                 };
 
-                let res = common::Response::ok(agent_job);
+                let res = entities::Response::ok(agent_job);
                 return Ok(HttpResponse::Ok().json(res));
             }
             None => tokio::time::sleep(sleep_for).await,
@@ -70,7 +70,7 @@ pub async fn get_agent_job(
     }
 
     // if no job is found, we return empty response
-    let res = common::Response::<Option<()>>::ok(None);
+    let res = entities::Response::<Option<()>>::ok(None);
     Ok(HttpResponse::Ok().json(res))
 }
 
@@ -78,19 +78,19 @@ pub async fn get_agent_job(
 pub async fn get_jobs(state: web::Data<AppState>) -> Result<HttpResponse, error::Error> {
     let jobs = state.service.list_jobs().await?;
     let jobs = jobs.into_iter().map(Into::into).collect();
-    let res = common::JobList { jobs };
+    let res = entities::JobList { jobs };
 
-    let res = common::Response::ok(res);
+    let res = entities::Response::ok(res);
     Ok(HttpResponse::Ok().json(res))
 }
 
 #[post("/jobs/result")]
 pub async fn post_job_result(
     state: web::Data<AppState>,
-    input: web::Json<common::UpdateJobResult>,
+    input: web::Json<entities::UpdateJobResult>,
 ) -> Result<HttpResponse, error::Error> {
     state.service.update_job_result(input.into_inner()).await?;
 
-    let res = common::Response::ok(true);
+    let res = entities::Response::ok(true);
     Ok(HttpResponse::Ok().json(res))
 }

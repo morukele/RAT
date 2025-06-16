@@ -31,7 +31,7 @@ fn main() -> Result<(), anyhow::Error> {
         .arg_required_else_help(true)
         .get_matches();
 
-    let api_client = api::Client::new(config::SERVER_URL.to_string());
+    let api_client = api::Client::new();
 
     if cli.subcommand_matches(cli::AGENTS).is_some() {
         cli::agents::run(&api_client)?;
@@ -41,7 +41,7 @@ fn main() -> Result<(), anyhow::Error> {
         // safe to unwrap required arguments
         let agent_id: &String = matches.get_one("agent").unwrap();
         let command: &String = matches.get_one("command").unwrap();
-        cli::exec::run(&api_client, agent_id, command)?;
+        // cli::exec::run(&api_client, agent_id, command)?;
     }
 
     Ok(())

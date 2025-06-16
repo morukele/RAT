@@ -1,5 +1,5 @@
 use crate::config;
-use server::common;
+use common::entities;
 use std::process::Command;
 use std::thread::sleep;
 use std::time::Duration;
@@ -20,7 +20,7 @@ pub fn run(api_client: &ureq::Agent, agent_id: Uuid) -> ! {
             }
         };
 
-        let api_res: common::Response<common::AgentJob> = match server_res.into_json() {
+        let api_res: entities::Response<entities::AgentJob> = match server_res.into_json() {
             Ok(res) => res,
             Err(err) => {
                 log::debug!("Error parsing JSON: {}", err);
@@ -41,7 +41,7 @@ pub fn run(api_client: &ureq::Agent, agent_id: Uuid) -> ! {
         };
 
         let output = execute_command(job.command, job.args);
-        let job_result = common::UpdateJobResult {
+        let job_result = entities::UpdateJobResult {
             job_id: job.id,
             output,
         };

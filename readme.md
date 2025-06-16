@@ -27,6 +27,7 @@ R.A.T (Remote Access Tool) is a system that enables remote command execution on 
 - Job queuing and management
 - Real-time command output
 - Cross-platform support
+- Encrypted data exchange
 
 ## Architecture
 

@@ -1,8 +1,7 @@
-use crate::common::AgentRegistered;
-use crate::entities::{Agent, AgentCreationDetail};
+use crate::error;
 use crate::service::Service;
-use crate::{entities, error};
 use chrono::Utc;
+use common::entities;
 use uuid::Uuid;
 
 impl Service {
@@ -10,14 +9,14 @@ impl Service {
         self.repo.find_all_agents(&self.db).await
     }
 
-    pub async fn find_agent(&self, agent_id: Uuid) -> Result<Agent, error::Error> {
+    pub async fn find_agent(&self, agent_id: Uuid) -> Result<entities::Agent, error::Error> {
         self.repo.find_agent_by_id(&self.db, agent_id).await
     }
 
     pub async fn register_agent(
         &self,
-        agent_details: AgentCreationDetail,
-    ) -> Result<AgentRegistered, error::Error> {
+        agent_details: entities::AgentCreationDetail,
+    ) -> Result<entities::AgentRegistered, error::Error> {
         let id = Uuid::new_v4();
         let created_at = Utc::now();
         let agent = entities::Agent {
@@ -34,6 +33,6 @@ impl Service {
 
         self.repo.create_agent(&self.db, &agent).await?;
 
-        Ok(AgentRegistered { id })
+        Ok(entities::AgentRegistered { id })
     }
 }

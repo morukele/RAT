@@ -1,6 +1,6 @@
-use crate::entities::Job;
 use crate::error;
 use crate::repository::Repository;
+use common::entities::Job;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 

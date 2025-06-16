@@ -16,7 +16,15 @@ chrono = { version = "0.4.41", features = ["serde"] }
 dotenv = "0.15.0"
 log = "0.4.27"
 serde = { version = "1.0.219", features = ["derive"] }
-sqlx = { version = "0.8.5", features = ["runtime-tokio-rustls", "postgres", "migrate", "json", "chrono", "time", "uuid"] }
+sqlx = { version = "0.8.5", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "migrate",
+    "json",
+    "chrono",
+    "time",
+    "uuid",
+] }
 thiserror = "2.0.12"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 uuid = { version = "1.16.0", features = ["v4", "serde"] }
@@ -25,3 +33,4 @@ anyhow = "1.0.98"
 actix-cors = "0.7.1"
 local-ip-address = "0.6.5"
 whoami = "1.6.0"
+common = { path = "../common" }

@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 server = { path = "../server" }
+common = { path = "../common" }
 thiserror = "2.0.12"
 uuid = "1.16.0"
 reqwest = { version = "0.12.15", features = ["blocking", "json"] }
@@ -13,8 +14,10 @@ anyhow = "1.0.98"
 clap = { version = "4.5.38", features = ["cargo"] }
 log = "0.4.27"
 ed25519-dalek = "1"
-x25519-dalek = "2.0.1"
-chacha20poly1305 = "0.10.1"
-blake2 = "0.10.6"
+x25519-dalek = "1"
+chacha20poly1305 = "0.8"
+blake2 = "0.9"
 rand = "0.7"
 base64 = "0.13"
+zeroize = "1.8.1"
+serde_json = "1.0.140"

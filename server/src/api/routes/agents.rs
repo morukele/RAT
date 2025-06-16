@@ -1,24 +1,24 @@
 use crate::api::AppState;
-use crate::entities::AgentCreationDetail;
-use crate::{common, error};
+use crate::error;
 use actix_web::web::Json;
 use actix_web::{HttpResponse, get, post, web};
+use common::entities;
 use uuid::Uuid;
 
 #[get("/agents")]
 pub async fn get_agents(state: web::Data<AppState>) -> Result<HttpResponse, error::Error> {
     let agent = state.service.list_agents().await?;
     let agents = agent.into_iter().collect();
-    let res = common::AgentList { agents };
+    let res = entities::AgentList { agents };
 
-    let res = common::Response::ok(res);
+    let res = entities::Response::ok(res);
     Ok(HttpResponse::Ok().json(res))
 }
 
 #[post("/agents")]
 pub async fn post_agents(
     state: web::Data<AppState>,
-    agent_details: Json<AgentCreationDetail>,
+    agent_details: Json<entities::AgentCreationDetail>,
 ) -> Result<HttpResponse, error::Error> {
     // get details of agent
     let agent_info = state
@@ -26,7 +26,7 @@ pub async fn post_agents(
         .register_agent(agent_details.into_inner())
         .await?;
 
-    let res = common::Response::ok(agent_info);
+    let res = entities::Response::ok(agent_info);
     Ok(HttpResponse::Ok().json(res))
 }
 
@@ -37,7 +37,7 @@ pub async fn get_agent(
 ) -> Result<HttpResponse, error::Error> {
     // get agent info
     let agent = state.service.find_agent(agent_id.into_inner()).await?;
-    let res = common::Response::ok(agent);
+    let res = entities::Response::ok(agent);
 
     Ok(HttpResponse::Ok().json(res))
 }

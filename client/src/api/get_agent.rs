@@ -1,5 +1,5 @@
 use crate::{api::Client, config, error};
-use server::{common, entities};
+use common::entities;
 use uuid::Uuid;
 
 impl Client {
@@ -7,7 +7,7 @@ impl Client {
         let get_agent_route = format!("{}/api/agents/{}", config::SERVER_URL, agent_id);
 
         let res = self.http_client.get(get_agent_route).send()?;
-        let api_res: common::Response<server::entities::Agent> = res.json()?;
+        let api_res: entities::Response<entities::Agent> = res.json()?;
 
         if let Some(err) = api_res.error {
             return Err(error::Error::Internal(err.message));

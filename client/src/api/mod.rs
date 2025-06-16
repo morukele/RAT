@@ -8,11 +8,10 @@ use reqwest::redirect;
 
 pub struct Client {
     pub http_client: reqwest::blocking::Client,
-    server_url: String,
 }
 
 impl Client {
-    pub fn new(server_url: String) -> Client {
+    pub fn new() -> Client {
         let http_timeout = std::time::Duration::from_secs(5);
         let http_client = reqwest::blocking::Client::builder()
             .redirect(redirect::Policy::limited(4))
@@ -20,9 +19,6 @@ impl Client {
             .build()
             .expect("api: Building HTTP client failed");
 
-        Client {
-            http_client,
-            server_url,
-        }
+        Client { http_client }
     }
 }
