@@ -29,7 +29,7 @@ pub async fn get_job_result(
 
     // long polling: 5 secs
     for _ in 0..5u64 {
-        let job = state.service.find_job(job_id).await?;
+        let job = state.service.get_job_result(job_id).await?;
         log::debug!("Job Route -> job: {:?}", job);
         match &job.output {
             Some(_) => {

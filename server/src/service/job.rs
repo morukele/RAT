@@ -1,13 +1,24 @@
+use crate::entities::Job;
 use crate::error;
 use crate::service::Service;
 use chrono::Utc;
-use common::entities::{CreateJob, Job, UpdateJobResult};
-use sqlx::types::Json;
+use common::{
+    api::{CreateJob, UpdateJobResult},
+    crypto,
+};
 use uuid::Uuid;
 
 impl Service {
-    pub async fn find_job(&self, job_id: Uuid) -> Result<Job, error::Error> {
-        self.repo.find_job_by_id(&self.db, job_id).await
+    pub async fn get_job_result(&self, job_id: Uuid) -> Result<Option<Job>, error::Error> {
+        let job = self.repo.find_job_by_id(&self.db, job_id).await?;
+
+        match &job.encrypted_result {
+            Some(_) => {
+                self.repo.delete_job(&self.db, job.id).await?;
+                Ok(Some(job))
+            }
+            None => Ok(None),
+        }
     }
 
     pub async fn list_jobs(&self) -> Result<Vec<Job>, error::Error> {
@@ -29,35 +40,95 @@ impl Service {
 
     pub async fn update_job_result(&self, input: UpdateJobResult) -> Result<(), error::Error> {
         let mut job = self.repo.find_job_by_id(&self.db, input.job_id).await?;
+        let agent = self.repo.find_agent_by_id(&self.db, job.agent_id).await?;
 
-        job.executed_at = Some(Utc::now());
-        job.output = Some(input.output);
+        // validate input
+        if input.encrypted_job_result.len() > super::ENCRYPTED_JOB_RESULT_MAX_SIZE {
+            return Err(error::Error::InvalidArgument(
+                "Result is too large".to_string(),
+            ));
+        }
+
+        if input.signature.len() != crypto::ED25519_SIGNATURE_SIZE {
+            return Err(error::Error::InvalidArgument(
+                "Signature size is not valid".to_string(),
+            ));
+        }
+
+        let mut job_result_buffer = input.job_id.as_bytes().to_vec();
+        job_result_buffer.append(&mut agent.id.as_bytes().to_vec());
+        job_result_buffer.append(&mut input.encrypted_job_result.clone());
+        job_result_buffer.append(&mut input.ephemeral_public_key.to_vec());
+        job_result_buffer.append(&mut input.nonce.to_vec());
+
+        let signature = ed25519_dalek::Signature::try_from(&input.signature[0..64])
+            .map_err(|e| error::Error::Internal(e.to_string()))?;
+        let agent_identity_public_key =
+            ed25519_dalek::PublicKey::from_bytes(&agent.identity_public_key)
+                .map_err(|e| error::Error::Internal(e.to_string()))?;
+
+        if agent_identity_public_key
+            .verify_strict(&job_result_buffer, &signature)
+            .is_err()
+        {
+            return Err(error::Error::InvalidArgument(
+                "Signature is not valid".to_string(),
+            ));
+        }
+
+        job.encrypted_result = Some(input.encrypted_job_result);
+        job.result_ephemeral_public_key = Some(input.ephemeral_public_key.to_vec());
+        job.result_nonce = Some(input.nonce.to_vec());
+        job.result_signature = Some(input.signature);
+
         self.repo.update_job(&self.db, &job).await
     }
 
     pub async fn create_job(&self, input: CreateJob) -> Result<Job, error::Error> {
-        println!("creating job: {:?}", input);
-        let command = input.command.trim();
-        let mut command_with_args: Vec<String> =
-            command.split_whitespace().map(|s| s.to_owned()).collect();
-
-        if command_with_args.is_empty() {
+        // validate input
+        if input.encrypted_job.len() > super::ENCRYPTED_JOB_MAX_SIZE {
             return Err(error::Error::InvalidArgument(
-                "Command is not valid".to_string(),
+                "Job is too large".to_string(),
             ));
         }
 
-        let command = command_with_args.remove(0);
+        if input.signature.len() != crypto::ED25519_SIGNATURE_SIZE {
+            return Err(error::Error::InvalidArgument(
+                "Signature size is not valid".to_string(),
+            ));
+        }
 
-        let now = Utc::now();
+        let mut job_buffer = input.id.as_bytes().to_vec();
+        job_buffer.append(&mut input.agent_id.as_bytes().to_vec());
+        job_buffer.append(&mut input.encrypted_job.clone());
+        job_buffer.append(&mut input.ephemeral_public_key.to_vec());
+        job_buffer.append(&mut input.nonce.to_vec());
+
+        let signature = ed25519_dalek::Signature::try_from(&input.signature[0..64])
+            .map_err(|e| error::Error::Internal(e.to_string()))?;
+
+        if !self
+            .config
+            .client_identity_public_key
+            .verify_strict(&job_buffer, &signature)
+            .is_ok()
+        {
+            return Err(error::Error::InvalidArgument(
+                "Signature is not valid".to_string(),
+            ));
+        }
+
         let new_job = Job {
-            id: Uuid::new_v4(),
-            created_at: now,
-            executed_at: None,
-            command,
-            args: Vec::from(command_with_args),
-            output: None,
+            id: input.id,
             agent_id: input.agent_id,
+            encrypted_job: input.encrypted_job,
+            ephemeral_public_key: input.ephemeral_public_key.to_vec(),
+            nonce: input.nonce.to_vec(),
+            signature: input.signature,
+            encrypted_result: None,
+            result_ephemeral_public_key: None,
+            result_nonce: None,
+            result_signature: None,
         };
 
         self.repo.create_job(&self.db, &new_job).await?;

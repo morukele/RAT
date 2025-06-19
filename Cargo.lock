@@ -2538,9 +2538,11 @@ dependencies = [
  "actix-cors",
  "actix-web",
  "anyhow",
+ "base64 0.13.1",
  "chrono",
  "common",
  "dotenv",
+ "ed25519-dalek",
  "env_logger",
  "local-ip-address",
  "log",
@@ -2550,6 +2552,7 @@ dependencies = [
  "tokio",
  "uuid",
  "whoami",
+ "x25519-dalek",
 ]
 
 [[package]]

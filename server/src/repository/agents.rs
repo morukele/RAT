@@ -1,7 +1,7 @@
+use crate::entities::Agent;
 use crate::error;
 use crate::error::Error;
 use crate::repository::Repository;
-use common::entities::Agent;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
