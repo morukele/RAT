@@ -2,7 +2,7 @@ use crate::{api, config, error};
 use blake2::digest::{Update, VariableOutput};
 use chacha20poly1305::XChaCha20Poly1305;
 use chacha20poly1305::aead::{Aead, NewAead};
-use common::{crypto, entities};
+use common::crypto;
 use ed25519_dalek::PublicKey;
 use rand::RngCore;
 use std::thread::sleep;
@@ -75,7 +75,13 @@ fn encrypt_and_sign_job(
     agent_public_prekey: [u8; crypto::X25519_PUBLIC_KEY_SIZE],
     agent_public_prekey_signature: &[u8],
     agent_identity_public_key: &PublicKey,
-) -> Result<(entities::CreateJob, [u8; crypto::X25519_PRIVATE_KEY_SIZE]), error::Error> {
+) -> Result<
+    (
+        common::api::CreateJob,
+        [u8; crypto::X25519_PRIVATE_KEY_SIZE],
+    ),
+    error::Error,
+> {
     if agent_public_prekey_signature.len() != crypto::ED25519_SIGNATURE_SIZE {
         return Err(error::Error::Internal(
             "Agent's prekey signature size is not valid".to_string(),
@@ -127,7 +133,7 @@ fn encrypt_and_sign_job(
     let mut key = kdf.finalize_boxed();
 
     // serialize job
-    let encrypted_job_payload = entities::JobPayload {
+    let encrypted_job_payload = common::api::JobPayload {
         command,
         args,
         result_ephemeral_public_key: job_result_ephemeral_public_key,
@@ -158,7 +164,7 @@ fn encrypt_and_sign_job(
     let signature = identity.sign(&buffer_to_sign, &config.identity_public_key);
 
     Ok((
-        entities::CreateJob {
+        common::api::CreateJob {
             id: job_id,
             agent_id,
             encrypted_job,

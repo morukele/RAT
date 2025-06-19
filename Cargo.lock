@@ -229,17 +229,22 @@ name = "agent"
 version = "0.1.0"
 dependencies = [
  "base64 0.13.1",
+ "blake2",
+ "chacha20poly1305 0.9.1",
  "common",
  "dirs",
  "ed25519-dalek",
  "local-ip-address",
  "log",
  "rand 0.7.3",
+ "serde",
+ "serde_json",
  "server",
  "ureq",
  "uuid",
  "whoami",
  "x25519-dalek",
+ "zeroize",
 ]
 
 [[package]]
@@ -513,13 +518,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "chacha20"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c80e5460aa66fe3b91d40bcbdab953a597b60053e34d684ac6903f863b680a6"
+dependencies = [
+ "cfg-if",
+ "cipher",
+ "cpufeatures 0.2.17",
+ "zeroize",
+]
+
+[[package]]
 name = "chacha20poly1305"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1580317203210c517b6d44794abfbe600698276db18127e37ad3e69bf5e848e5"
 dependencies = [
  "aead",
- "chacha20",
+ "chacha20 0.7.1",
+ "cipher",
+ "poly1305",
+ "zeroize",
+]
+
+[[package]]
+name = "chacha20poly1305"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a18446b09be63d457bbec447509e85f662f32952b035ce892290396bc0b0cff5"
+dependencies = [
+ "aead",
+ "chacha20 0.8.2",
  "cipher",
  "poly1305",
  "zeroize",
@@ -583,7 +613,7 @@ dependencies = [
  "anyhow",
  "base64 0.13.1",
  "blake2",
- "chacha20poly1305",
+ "chacha20poly1305 0.8.0",
  "clap",
  "common",
  "ed25519-dalek",

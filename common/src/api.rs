@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Display};
 use uuid::Uuid;
 
 use crate::crypto;
@@ -74,6 +74,12 @@ pub struct Job {
     pub result_signature: Option<Vec<u8>>,
 }
 
+impl Display for Job {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self)
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct JobPayload {
     pub command: String,
@@ -120,4 +126,9 @@ pub struct Agent {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AgentList {
     pub agents: Vec<Agent>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct JobList {
+    pub jobs: Vec<Job>,
 }

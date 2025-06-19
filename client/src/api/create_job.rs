@@ -1,14 +1,14 @@
 use crate::api::Client;
 use crate::{config, error};
-use common::entities;
+use common::api;
 use uuid::Uuid;
 
 impl Client {
-    pub fn create_job(&self, input: entities::CreateJob) -> Result<Uuid, error::Error> {
+    pub fn create_job(&self, input: api::CreateJob) -> Result<Uuid, error::Error> {
         let post_job_route = format!("{}/api/jobs", config::SERVER_URL);
 
         let res = self.http_client.post(post_job_route).json(&input).send()?;
-        let api_res: entities::Response<entities::Job> = res.json()?;
+        let api_res: api::Response<api::Job> = res.json()?;
 
         if let Some(err) = api_res.error {
             return Err(error::Error::Internal(err.message));

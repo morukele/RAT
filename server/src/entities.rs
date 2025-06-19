@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use common::api;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, sqlx::FromRow)]
@@ -45,7 +46,7 @@ impl Into<api::Job> for Job {
     }
 }
 
-#[derive(Debug, Clone, sqlx::FromRow)]
+#[derive(Debug, Clone, sqlx::FromRow, Deserialize, Serialize)]
 pub struct Agent {
     pub id: Uuid,
     pub ip_addr: String,

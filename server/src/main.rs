@@ -20,7 +20,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let db_pool = db::connect(&config.database_url).await?;
     db::migrate(&db_pool).await?;
 
-    let service = Service::new(db_pool);
+    let service = Service::new(db_pool, config.clone()); // avoid cloning
     let app_state = AppState::new(service);
 
     let address = format!("{}:{}", config.host, config.port);

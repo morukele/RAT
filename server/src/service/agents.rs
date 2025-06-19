@@ -6,8 +6,19 @@ use common::{api, crypto};
 use uuid::Uuid;
 
 impl Service {
-    pub async fn list_agents(&self) -> Result<Vec<entities::Agent>, error::Error> {
-        self.repo.find_all_agents(&self.db).await
+    pub async fn list_agents(&self) -> Result<api::AgentList, error::Error> {
+        let agents: Vec<api::Agent> = self
+            .repo
+            .find_all_agents(&self.db)
+            .await?
+            .into_iter()
+            .map(|a| {
+                let a: api::Agent = a.into();
+                a
+            })
+            .collect();
+
+        Ok(api::AgentList { agents })
     }
 
     pub async fn find_agent(&self, agent_id: Uuid) -> Result<entities::Agent, error::Error> {

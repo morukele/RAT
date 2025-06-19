@@ -11,6 +11,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .user_agent("0xSpada_agent/0.1")
         .build();
 
-    let agent_id = init::init(&api_client)?;
-    run::run(&api_client, agent_id);
+    let config = init::init(&api_client)?;
+    run::run(&api_client, config);
 }
