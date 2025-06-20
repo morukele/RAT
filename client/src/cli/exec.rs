@@ -3,7 +3,6 @@ use blake2::digest::{Update, VariableOutput};
 use chacha20poly1305::XChaCha20Poly1305;
 use chacha20poly1305::aead::{Aead, NewAead};
 use common::crypto;
-use ed25519_dalek::PublicKey;
 use rand::RngCore;
 use std::thread::sleep;
 use std::time::Duration;
@@ -61,7 +60,7 @@ pub fn run(
             let job_output = decrypt_and_verify_job_output(
                 job,
                 job_ephemeral_private_key,
-                agent_identity_public_key,
+                &agent_identity_public_key,
             )?;
             println!("{}", job_output);
             break;
@@ -76,7 +75,7 @@ pub fn run(
 fn decrypt_and_verify_job_output(
     job: common::api::Job,
     job_ephemeral_private_key: [u8; crypto::X25519_PRIVATE_KEY_SIZE],
-    agent_identity_public_key: PublicKey,
+    agent_identity_public_key: &ed25519_dalek::PublicKey,
 ) -> Result<String, error::Error> {
     // verify payload
     let encrypted_job_result = job.encrypted_result.ok_or(error::Error::Internal(
@@ -149,7 +148,7 @@ fn encrypt_and_sign_job(
     agent_id: Uuid,
     agent_public_prekey: [u8; crypto::X25519_PUBLIC_KEY_SIZE],
     agent_public_prekey_signature: &[u8],
-    agent_identity_public_key: &PublicKey,
+    agent_identity_public_key: &ed25519_dalek::PublicKey,
 ) -> Result<
     (
         common::api::CreateJob,

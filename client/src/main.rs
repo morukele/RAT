@@ -29,6 +29,7 @@ fn main() -> Result<(), anyhow::Error> {
                         .index(1),
                 ),
         )
+        .subcommand(Command::new(cli::IDENTITY).about("Generates a new identity keypair"))
         .arg_required_else_help(true)
         .get_matches();
 

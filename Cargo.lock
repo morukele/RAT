@@ -2582,7 +2582,6 @@ dependencies = [
  "tokio",
  "uuid",
  "whoami",
- "x25519-dalek",
 ]
 
 [[package]]

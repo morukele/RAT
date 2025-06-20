@@ -77,7 +77,8 @@ impl Repository {
         db: &Pool<Postgres>,
         agent_id: Uuid,
     ) -> Result<Job, error::Error> {
-        const QUERY: &str = "SELECT * FROM jobs WHERE agent_id = $1 AND output IS NULL LIMIT 1";
+        const QUERY: &str =
+            "SELECT * FROM jobs WHERE agent_id = $1 AND encrypted_result IS NULL LIMIT 1";
         match sqlx::query_as::<_, Job>(QUERY)
             .bind(agent_id)
             .fetch_optional(db)
@@ -93,7 +94,7 @@ impl Repository {
     }
 
     pub async fn find_all_jobs(&self, db: &Pool<Postgres>) -> Result<Vec<Job>, error::Error> {
-        const QUERY: &str = "SELECT * FROM jobs ORDER BY created_at";
+        const QUERY: &str = "SELECT * FROM jobs ORDER BY encrypted_result";
 
         match sqlx::query_as::<_, Job>(QUERY).fetch_all(db).await {
             Err(err) => {

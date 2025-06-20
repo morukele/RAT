@@ -10,6 +10,10 @@ build: agent client server
 agent:
 	cargo build -p agent --release
 
+.PHONY: debug
+debug:
+	cargo build
+
 .PHONY: client
 client:
 	cargo build -p client --release
@@ -41,3 +45,4 @@ compose:
 .PHONY: clean
 clean:
 	cargo clean
+	rm -f ../../0xSpada
