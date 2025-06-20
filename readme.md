@@ -200,6 +200,7 @@ The agent stores its configuration in:
 2. Create your feature branch
 3. Make your changes
 4. Submit a pull request
+>** Feel free to check the issues tab for inspiration.**
 
 ## Security
 
