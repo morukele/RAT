@@ -6,3 +6,4 @@ pub mod job;
 pub const AGENTS: &str = "agents";
 pub const EXEC: &str = "exec";
 pub const JOBS: &str = "jobs";
+pub const IDENTITY: &str = "identity";

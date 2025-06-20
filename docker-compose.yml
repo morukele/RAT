@@ -12,7 +12,8 @@ services:
     environment:
       - ENV_PORT=${ENV_PORT}
       - ENV_HOST=${ENV_HOST}
-      - DATABASE_URL=postgres://postgres:password@ratdb:5432/ratdb?sslmode=disable
+      - CLIENT_IDENTITY_PUBLIC_KEY=${CLIENT_IDENTITY_PUBLIC_KEY}
+      - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - db
     restart: unless-stopped

@@ -54,9 +54,15 @@ pub fn run(
     log::debug!("Job created: {}", job_id);
 
     loop {
-        let job_output = api_client.get_job_results(job_id)?;
-        log::debug!("job results: {:?}", job_output);
-        if let Some(job_output) = job_output {
+        let job = api_client.get_job_results(job_id)?;
+        log::debug!("job results: {:?}", job);
+        if let Some(job) = job {
+            // decrypt job output
+            let job_output = decrypt_and_verify_job_output(
+                job,
+                job_ephemeral_private_key,
+                agent_identity_public_key,
+            )?;
             println!("{}", job_output);
             break;
         }
@@ -65,6 +71,75 @@ pub fn run(
 
     job_ephemeral_private_key.zeroize();
     Ok(())
+}
+
+fn decrypt_and_verify_job_output(
+    job: common::api::Job,
+    job_ephemeral_private_key: [u8; crypto::X25519_PRIVATE_KEY_SIZE],
+    agent_identity_public_key: PublicKey,
+) -> Result<String, error::Error> {
+    // verify payload
+    let encrypted_job_result = job.encrypted_result.ok_or(error::Error::Internal(
+        "Job's result is missing".to_string(),
+    ))?;
+    let result_ephemeral_public_key =
+        job.result_ephemeral_public_key
+            .ok_or(error::Error::Internal(
+                "Job's result ephemeral public key is missing".to_string(),
+            ))?;
+    let result_nonce = job.result_nonce.ok_or(error::Error::Internal(
+        "Job's result nonce is missing".to_string(),
+    ))?;
+
+    let mut buffer_to_verify = job.id.as_bytes().to_vec();
+    buffer_to_verify.append(&mut job.agent_id.as_bytes().to_vec());
+    buffer_to_verify.append(&mut encrypted_job_result.clone());
+    buffer_to_verify.append(&mut result_ephemeral_public_key.to_vec());
+    buffer_to_verify.append(&mut result_nonce.to_vec());
+
+    let result_signature = job.result_signature.ok_or(error::Error::Internal(
+        "Job's result signature is missing".to_string(),
+    ))?;
+    if result_signature.len() != crypto::ED25519_SIGNATURE_SIZE {
+        return Err(error::Error::Internal(
+            "Job's result signature size is not valid".to_string(),
+        ));
+    }
+
+    let signature = ed25519_dalek::Signature::try_from(&result_signature[0..64])
+        .map_err(|e| error::Error::Internal(e.to_string()))?;
+    if agent_identity_public_key
+        .verify_strict(&buffer_to_verify, &signature)
+        .is_err()
+    {
+        return Err(error::Error::Internal(
+            "Agent's prekey signature is not valid".to_string(),
+        ));
+    }
+
+    // key exchange with public_prekey & keypair for job encryption
+    let mut shared_secret = x25519(job_ephemeral_private_key, result_ephemeral_public_key);
+
+    // derive key
+    let mut kdf =
+        blake2::VarBlake2b::new_keyed(&shared_secret, crypto::XCHACHA20_POLY1305_KEY_SIZE);
+    kdf.update(&result_nonce);
+    let mut key = kdf.finalize_boxed();
+
+    // decrypt job result
+    let cipher = XChaCha20Poly1305::new(key.as_ref().into());
+    let decrypted_job_bytes = cipher
+        .decrypt(&result_nonce.into(), encrypted_job_result.as_ref())
+        .map_err(|e| error::Error::Internal(e.to_string()))?;
+
+    shared_secret.zeroize();
+    key.zeroize();
+
+    // deserialize job result
+    let job_result: common::api::JobResult = serde_json::from_slice(&decrypted_job_bytes)
+        .map_err(|e| error::Error::Internal(e.to_string()))?;
+
+    Ok(job_result.output)
 }
 
 fn encrypt_and_sign_job(

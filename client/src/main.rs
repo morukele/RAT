@@ -1,4 +1,5 @@
 use clap::{Arg, Command};
+use config::Config;
 
 mod api;
 mod cli;
@@ -37,11 +38,14 @@ fn main() -> Result<(), anyhow::Error> {
         cli::agents::run(&api_client)?;
     } else if cli.subcommand_matches(cli::JOBS).is_some() {
         cli::job::run(&api_client)?;
+    } else if cli.subcommand_matches(cli::IDENTITY).is_some() {
+        cli::identity::run();
     } else if let Some(matches) = cli.subcommand_matches(cli::EXEC) {
         // safe to unwrap required arguments
         let agent_id: &String = matches.get_one("agent").unwrap();
         let command: &String = matches.get_one("command").unwrap();
-        // cli::exec::run(&api_client, agent_id, command)?;
+        let config = Config::load()?;
+        cli::exec::run(&api_client, agent_id, command, config)?;
     }
 
     Ok(())
