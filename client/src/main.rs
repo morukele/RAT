@@ -13,6 +13,17 @@ fn main() -> Result<(), anyhow::Error> {
         .subcommand(Command::new(cli::AGENTS).about("List all agents"))
         .subcommand(Command::new(cli::JOBS).about("List all jobs"))
         .subcommand(
+            Command::new(cli::JOB_INFO)
+                .about("Get the result of a job")
+                .arg(
+                    Arg::new("job")
+                        .short('j')
+                        .long("job")
+                        .help("The id of the job to get the details")
+                        .required(true),
+                ),
+        )
+        .subcommand(
             Command::new(cli::EXEC)
                 .about("Execute a command")
                 .arg(
@@ -38,6 +49,10 @@ fn main() -> Result<(), anyhow::Error> {
         cli::agents::run(&api_client)?;
     } else if cli.subcommand_matches(cli::JOBS).is_some() {
         cli::job::run(&api_client)?;
+    } else if let Some(job) = (cli.subcommand_matches(cli::JOB_INFO)) {
+        // safe to unwrap require argument
+        let job_id: &String = job.get_one("job").unwrap();
+        cli::job::get_job_res(&api_client, job_id)?;
     } else if let Some(matches) = cli.subcommand_matches(cli::EXEC) {
         // safe to unwrap required arguments
         let agent_id: &String = matches.get_one("agent").unwrap();

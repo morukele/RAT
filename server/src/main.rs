@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use server::api::routes::routes;
@@ -7,12 +8,11 @@ use server::db;
 use server::service::Service;
 use std::env;
 use std::net::TcpListener;
-use actix_cors::Cors;
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result<(), anyhow::Error> {
     unsafe {
-        env::set_var("RUST_LOG", "debug");
+        env::set_var("RUST_LOG", "info");
     }
     env_logger::init();
     let config = Config::load().expect("Failed to load config");
