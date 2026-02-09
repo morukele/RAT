@@ -3,9 +3,11 @@
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Build](https://img.shields.io/badge/build-passing-green.svg)
 
-> **⚠️ WARNING: This software is for educational purposes only. Misuse of this software may be illegal in your jurisdiction. Use responsibly and only on systems you own or have explicit permission to access.**
+> **⚠️ WARNING: This software is for educational purposes only. Misuse of this software may be illegal in your
+jurisdiction. Use responsibly and only on systems you own or have explicit permission to access.**
 
-R.A.T (Remote Access Tool) is a system that enables remote command execution on target systems. It allows operators to securely execute shell commands on remote computers, phones, or IoT devices.
+R.A.T (Remote Access Tool) is a system that enables remote command execution on target systems. It allows operators to
+securely execute shell commands on remote computers, phones, or IoT devices.
 
 ## Table of Contents
 
@@ -34,23 +36,23 @@ The system consists of three main components:
 
 1. **Agent**: The client-side software that:
 
-   - Runs on the target system
-   - Handles command execution
-   - Manages system registration
-   - Reports execution results
+    - Runs on the target system
+    - Handles command execution
+    - Manages system registration
+    - Reports execution results
 
 2. **Server** (Command & Control):
 
-   - Manages agent connections
-   - Handles job distribution
-   - Stores execution results
-   - Provides API endpoints
+    - Manages agent connections
+    - Handles job distribution
+    - Stores execution results
+    - Provides API endpoints
 
 3. **Client CLI**:
-   - User interface for operators
-   - Agent management
-   - Job creation and monitoring
-   - Result retrieval
+    - User interface for operators
+    - Agent management
+    - Job creation and monitoring
+    - Result retrieval
 
 ### System Flow
 
@@ -153,7 +155,7 @@ target/release/client jobs
 target/release/client exec --agent <AGENT_ID> "<SHELL_COMMAND>"
 
 # Get job result
-target/release/client job <JOB_ID>
+target/release/client job --job <JOB_ID>
 ```
 
 ## Configuration
@@ -179,20 +181,20 @@ The agent stores its configuration in:
 
 1. **Agent can't connect to server**
 
-   - Check if server is running
-   - Verify network connectivity
-   - Check firewall settings
+    - Check if server is running
+    - Verify network connectivity
+    - Check firewall settings
 
 2. **404 Not Found errors**
 
-   - Ensure agent is properly registered
-   - Verify agent ID is correct
-   - Check API endpoint URLs
+    - Ensure agent is properly registered
+    - Verify agent ID is correct
+    - Check API endpoint URLs
 
 3. **Database connection issues**
-   - Verify PostgreSQL is running
-   - Check connection string
-   - Ensure migrations are applied
+    - Verify PostgreSQL is running
+    - Check connection string
+    - Ensure migrations are applied
 
 ## Contributing
 
@@ -200,7 +202,8 @@ The agent stores its configuration in:
 2. Create your feature branch
 3. Make your changes
 4. Submit a pull request
->** Feel free to check the issues tab for inspiration.**
+
+> ** Feel free to check the issues tab for inspiration.**
 
 ## Security
 
