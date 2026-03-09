@@ -103,7 +103,7 @@ sequenceDiagram
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/rat.git
+git clone https://github.com/morukele/rat.git
 cd rat
 ```
 
